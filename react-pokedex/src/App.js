@@ -1,6 +1,7 @@
 import React from "react";
 import Pokedex from "./components/Pokedex";
 import Pokemon from "./components/Pokemon";
+// import mockData from "./utils/mockData";
 import { Route, Switch } from "react-router-dom";
 
 function App() {
