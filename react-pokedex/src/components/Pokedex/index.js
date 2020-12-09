@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Grid, Card, CardContent, CardMedia, CircularProgress, Typography } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import mockData from "../../utils/mockData";
-import { firstLetterUpper } from "../../utils/functions"
+import { toFirstCharUppercase } from "../../utils/functions";
+import axios from "axios";
 
 const useStyles = makeStyles({
     pokedexContainer: {
@@ -21,13 +21,28 @@ const useStyles = makeStyles({
 
 const Pokedex = props => {
     const classes = useStyles();
-    const [pokemonData, setPokemomData] = useState(mockData);
+    const [pokemonData, setPokemomData] = useState({});
     const { history } = props;
 
+    useEffect(() => {
+        axios.get(`https://pokeapi.co/api/v2/pokemon?limit=807`).then(function (response) {
+            const { data } = response;
+            const { results } = data;
+            const newPokemonData = {};
+            results.forEach((pokemon, index) => {
+                newPokemonData[index + 1] = {
+                    //only pulling data we need, if we want more from API call just add ing this object
+                    id: index + 1,
+                    name: pokemon.name,
+                    sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png`
+                }
+            });
+            setPokemomData(newPokemonData);
+        });
+    }, [])
 
     const getPokemonCard = (pokemonId) => {
-        const { id, name } = pokemonData[`${pokemonId}`];
-        const sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+        const { id, name, sprite } = pokemonData[pokemonId];
 
         // set for mobile screens item xs={12} sm={4}>
         console.log(pokemonData[`${pokemonId}`])
@@ -37,7 +52,7 @@ const Pokedex = props => {
                     <CardMedia className={classes.cardMedia} image={sprite} style={{ width: "130px", height: "130px" }} />
 
                     <CardContent className={classes.cardContent}>
-                        <Typography>{`${id}. ${firstLetterUpper(name)}`}</Typography>
+                        <Typography>{`${id}. ${toFirstCharUppercase(name)}`}</Typography>
                     </CardContent>
                 </Card>
             </Grid >
